@@ -3,5 +3,7 @@ https://github.com/vectormyke-github/cdond-c3-projectstarter.git
 
 [URL02]
 http://udapeople-89db992.s3-website-us-east-1.amazonaws.com
+http://udapeople-e325890.s3-website-us-east-1.amazonaws.com
 
-[URL03]s
+[URL03]
+d2iu3yb87sveac.cloudfront.net

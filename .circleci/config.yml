@@ -70,7 +70,6 @@ commands:
               npm run migrations:revert
             fi
 
-
 jobs:
   build-frontend:
     docker:
@@ -154,7 +153,6 @@ jobs:
             npm install                                  
             npm audit fix --force --audit-level=critical
             npm audit fix --force --audit-level=critical
-# npm audit --audit-level=critical 
 
   scan-backend:
     docker:
@@ -171,7 +169,6 @@ jobs:
             npm install 
             npm audit fix --force --audit-level=critical
             npm audit fix --force --audit-level=critical
-# npm audit --audit-level=critical 
 
   deploy-infrastructure:
     docker:
@@ -255,9 +252,8 @@ jobs:
             else
               echo "No migrations are pending" 
             fi
-# rolls back; should migration fail
       - destroy-environment
-      - revert-migrations  
+      - revert-migrations   # rolls back; should migration fail
 
   deploy-frontend:
     docker:
@@ -290,9 +286,8 @@ jobs:
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist            
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-# rolls back; should migration fail
       - destroy-environment
-      - revert-migrations 
+      - revert-migrations   # rolls back; should migration fail
 
   deploy-backend:
     docker:
@@ -331,13 +326,12 @@ jobs:
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -vvv -i inventory.txt deploy-backend.yml
-# rolls back; should migration fail
       - destroy-environment
-      - revert-migrations 
+      - revert-migrations    # rolls back; should migration fail
 
   smoke-test:
     docker:
-      - image: cimg/base:stable   #Executor
+      - image: cimg/base:stable
     steps:
       - checkout
       - install_awscli
@@ -363,19 +357,16 @@ jobs:
             if curl -s $FRONTEND_WEBSITE | grep "Welcome"
             then
               # This is the intentional error, if "Welcome" is indeed in the response this step will exit with exit code 1
-              exit 1
+              exit 0
             else
               exit 1
             fi
-# rolls back; should migration fail
       - destroy-environment
-      - revert-migrations  
+      - revert-migrations  # rolls back; should migration fail
 
   cloudfront-update:
     docker:
-      - image: cimg/base:stable   #Executor
-      # - image: circleci/node:13.8.0    #Executor
-      # - image: alpine:latest      #Executor
+      - image: cimg/base:stable
     steps:
       - checkout
       - install_awscli
@@ -401,13 +392,12 @@ jobs:
             --stack-name InitialStack \
             --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}"
             echo Current Workflow ID: "${CIRCLE_WORKFLOW_ID:0:7}"
-# rolls back; should migration fail
       - destroy-environment
-      - revert-migrations
+      - revert-migrations    # rolls back; should migration fail
 
   cleanup:
     docker:                                                                           
-      - image: cimg/base:stable   #Executor
+      - image: cimg/base:stable
     steps:
       - checkout
       - install_awscli
@@ -430,41 +420,9 @@ jobs:
               aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
             fi
 
-
-# =============================================================================================
-
-  # cleanup:
-  #   docker:
-  #     - image: amazon/aws-cli
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Get all stack workflow id and remove old stack files
-  #         command: |
-  #           CURRENT_WORKFLOW_ID=${CIRCLE_WORKFLOW_ID:0:7}
-  #           echo current workflow id: $CURRENT_WORKFLOW_ID
-  #           export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
-  #           --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
-  #           mystacks=($STACKS)
-  #           echo ${#mystacks[@]} items in stack :
-  #           echo $mystacks
-  #           for work_id in ${mystacks[@]}
-  #           do
-  #           if [ ${work_id: -7} != $CURRENT_WORKFLOW_ID ]
-  #           then
-  #               aws s3 rm "s3://udapeople-${work_id: -7}" --recursive
-  #               aws cloudformation delete-stack --stack-name "udapeople-backend-${work_id: -7}"
-  #               aws cloudformation delete-stack --stack-name "udapeople-frontend-${work_id: -7}"
-  #               echo $work_id removed from stack
-  #           else
-  #             echo No old stack to remove
-  #           fi
-  #           done
-# =====================================================================================
   configure-node-exporter:
     docker:
-      # - image: amazon/aws-cli   #Executor
-      - image: cimg/python:3.10     #Executor    
+      - image: cimg/python:3.10 
     steps:
       - checkout
       - install_ansible
@@ -491,23 +449,13 @@ jobs:
 
   deploy-prometheus-server:
     docker:
-      # - image: amazon/aws-cli    #Executor
-      - image: cimg/python:3.10         #Executor
+      - image: cimg/python:3.10
     steps:
       - checkout
       - install_ansible
       - install_awscli
       - add_ssh_keys:
           fingerprints: ["d4:64:2b:23:8c:d9:0c:72:4e:7f:f7:1b:fa:81:6b:3e"]
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       yum update -y
-      #       yum install -y  tar gzip
-      #       curl -sL https://rpm.nodesource.com/setup_13.x | bash -
-      #       yum install -y nodejs
-      #       amazon-linux-extras install -y epel
-      #       yum install -y ansible
       - attach_workspace:
           at: ~/
       - run:
@@ -565,3 +513,5 @@ workflows:
           requires: [smoke-test]
       - cleanup:
           requires: [cloudfront-update]
+      - configure-node-exporter:
+          requires: [cleanup]          
