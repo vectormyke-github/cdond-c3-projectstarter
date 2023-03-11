@@ -1,27 +1,57 @@
-- name: "install node exporter."
-  unarchive:
-    src: https://github.com/prometheus/node_exporter/releases/download/v0.17.0/node_exporter-0.17.0.linux-amd64.tar.gz
-    dest: /tmp
-    remote_src: yes
+---
+- name: 'Create user for Prometheus Node Exporter'
+  shell: |
+    sudo useradd --no-create-home node_exporter
 
-- name: "move binary to /usr/local/bin."
+- name: 'Install Node Exporter Binaries'
+  shell: |
+    wget https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz
+    tar xzf node_exporter-1.0.1.linux-amd64.tar.gz
+    sudo cp node_exporter-1.0.1.linux-amd64/node_exporter /usr/local/bin/node_exporter
+    rm -rf node_exporter-1.0.1.linux-amd64.tar.gz node_exporter-1.0.1.linux-amd64
+
+- name: 'Configure a Service # /etc/systemd/system/node-exporter.service'
   become: true
   copy:
-    src: /tmp/node_exporter-0.17.0.linux-amd64/node_exporter
-    dest: /usr/local/bin/node_exporter
-    remote_src: yes
-    mode: '0777'
+    src: roles/configure-prometheus-node-exporter/files/node_exporter.service
+    dest: /etc/systemd/system/node_exporter.service
+
+- name: 'Configure Systemd for auto-startup'
+  shell: |
+    sudo systemctl daemon-reload
+    sudo systemctl enable node_exporter
+    sudo systemctl start node_exporter
+    sudo systemctl status node_exporter       
+
+
+# - name: 'Create User for Node_Exporter'
+#   shell: |
+#     sudo useraadd --no-create-home node_exporter
+
+# - name: "install node exporter."
+#   unarchive:
+#     src: https://github.com/prometheus/node_exporter/releases/download/v0.17.0/node_exporter-0.17.0.linux-amd64.tar.gz
+#     dest: /tmp
+#     remote_src: yes
+
+# - name: "move binary to /usr/local/bin."
+#   become: true
+#   copy:
+#     src: /tmp/node_exporter-0.17.0.linux-amd64/node_exporter
+#     dest: /usr/local/bin/node_exporter
+#     remote_src: yes
+#     mode: '0777'
     
-- name: "add node exporter configuration."
-  become: true
-  copy:
-    src: node_exporter.service
-    dest: /etc/systemd/system/
+# - name: "add node exporter configuration."
+#   become: true
+#   copy:
+#     src: node_exporter.service
+#     dest: /etc/systemd/system/
 
-- name: "enable node_exporter service"
-  become: true
-  systemd:
-    state: restarted
-    daemon_reload: yes
-    name: node_exporter
-    enabled: yes
+# - name: "enable node_exporter service"
+#   become: true
+#   systemd:
+#     state: restarted
+#     daemon_reload: yes
+#     name: node_exporter
+#     enabled: yes
