@@ -1,3 +1,5 @@
+README
+
 [URL01]
 https://github.com/vectormyke-github/cdond-c3-projectstarter.git
 
@@ -7,3 +9,7 @@ http://udapeople-e325890.s3-website-us-east-1.amazonaws.com
 
 [URL03]
 d2iu3yb87sveac.cloudfront.net
+
+[URL04]
+ubuntu@ip-172-31-31-222:~$ curl 54.91.157.88:3030/api/status
+{"status":"ok","environment":"production"}ubuntu@ip-172-31-31-222:~$
