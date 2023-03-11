@@ -33,12 +33,11 @@
     - TYPEORM_MIGRATIONS: "{{ lookup('env', 'TYPEORM_MIGRATIONS') }}"
     - TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
     - TYPEORM_PORT: 5432
-    # - TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
     - TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
     - TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
     - TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
     # Add more env vars here
-
+    # - TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
   roles:
     - configure-server
     # - configure-prometheus-node-exporter
