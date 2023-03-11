@@ -438,39 +438,39 @@ jobs:
             cat inventory.txt
             ansible-playbook configure-prometheus-node-exporter.yml -i inventory.txt
 
-  deploy-prometheus-server:
-    docker:
-      - image: cimg/python:3.10
-    steps:
-      - checkout
-      - install_ansible
-      - install_awscli
-      - add_ssh_keys:
-          fingerprints: ["f0:f2:10:98:68:45:0f:5b:49:2b:6d:06:61:9d:49:66"]
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Spin up EC2 server for prometheus
-          command: |
-            echo "[server]" >> .circleci/ansible/inventory.txt
-            aws cloudformation deploy \
-              --template-file .circleci/files/prometheus-server.yml \
-              --tags project=prometheus \
-              --stack-name udapeople-prometheus-${CIRCLE_WORKFLOW_ID:0:7} \
-              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7}
-      - run:
-          name: Append IP to inventory file
-          command: |
-            aws ec2 describe-instances \
-            --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            --filters "Name=tag:project,Values=prometheus" \
-            --output text >> .circleci/ansible/inventory.txt
-      - run:
-          name: Install prometheus and alertmanager on server
-          command: |
-            cd .circleci/ansible
-            cat inventory.txt
-            ansible-playbook -i inventory.txt configure-prometheus-alertmanager.yml  
+  # deploy-prometheus-server:
+  #   docker:
+  #     - image: cimg/python:3.10
+  #   steps:
+  #     - checkout
+  #     - install_ansible
+  #     - install_awscli
+  #     - add_ssh_keys:
+  #         fingerprints: ["f0:f2:10:98:68:45:0f:5b:49:2b:6d:06:61:9d:49:66"]
+  #     - attach_workspace:
+  #         at: ~/
+  #     - run:
+  #         name: Spin up EC2 server for prometheus
+  #         command: |
+  #           echo "[server]" >> .circleci/ansible/inventory.txt
+  #           aws cloudformation deploy \
+  #             --template-file .circleci/files/prometheus-server.yml \
+  #             --tags project=prometheus \
+  #             --stack-name udapeople-prometheus-${CIRCLE_WORKFLOW_ID:0:7} \
+  #             --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7}
+  #     - run:
+  #         name: Append IP to inventory file
+  #         command: |
+  #           aws ec2 describe-instances \
+  #           --query 'Reservations[*].Instances[*].PublicIpAddress' \
+  #           --filters "Name=tag:project,Values=prometheus" \
+  #           --output text >> .circleci/ansible/inventory.txt
+  #     - run:
+  #         name: Install prometheus and alertmanager on server
+  #         command: |
+  #           cd .circleci/ansible
+  #           cat inventory.txt
+  #           ansible-playbook -i inventory.txt configure-prometheus-alertmanager.yml  
           
 workflows:
   default:
@@ -504,7 +504,7 @@ workflows:
           requires: [smoke-test]
       - cleanup:
           requires: [cloudfront-update]
-      - deploy-prometheus-server:
-          requires: [cleanup]            
+      # - deploy-prometheus-server:
+      #     requires: [cleanup]            
       - configure-node-exporter:
           requires: [cleanup]          
