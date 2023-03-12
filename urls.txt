@@ -4,12 +4,21 @@ README
 https://github.com/vectormyke-github/cdond-c3-projectstarter.git
 
 [URL02]
+http://udapeople-12c1536.s3-website-us-east-1.amazonaws.com
+
 http://udapeople-89db992.s3-website-us-east-1.amazonaws.com
 http://udapeople-e325890.s3-website-us-east-1.amazonaws.com
 
 [URL03]
 d2iu3yb87sveac.cloudfront.net
+d2iu3yb87sveac.cloudfront.net
 
 [URL04]
+Last login: Sat Mar 11 23:59:17 2023 from 3.85.218.241
+ubuntu@ip-172-31-49-143:~$ curl 54.144.143.162:3030/api/status
+{"status":"ok","environment":"production"}ubuntu@ip-172-31-49-143:~$
+
 ubuntu@ip-172-31-31-222:~$ curl 54.91.157.88:3030/api/status
 {"status":"ok","environment":"production"}ubuntu@ip-172-31-31-222:~$
+
+
